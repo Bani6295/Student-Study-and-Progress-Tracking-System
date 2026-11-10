@@ -123,10 +123,63 @@ def home():
     <div id="taskList"></div>
     <p id="empty">No tasks yet. Add your first task!</p>
 </div>
-
+<div class="container">
+    <h2>⏱️ Study Timer</h2>
+    <h1 id="timer">25:00</h1>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+    <p id="timerMessage">Ready to study?</p>
+</div>
 <script>
 let tasks = JSON.parse(localStorage.getItem("studyTasks") || "[]");
 
+let timeLeft = 25 * 60;
+let timerInterval = null;
+
+function updateTimer() {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+
+    document.getElementById("timer").textContent =
+        String(minutes).padStart(2, "0") + ":" +
+        String(seconds).padStart(2, "0");
+}
+
+function startTimer() {
+    if (timerInterval !== null || timeLeft === 0) return;
+
+    document.getElementById("timerMessage").textContent = "Focus on your studies!";
+
+    timerInterval = setInterval(function() {
+        if (timeLeft > 0) {
+            timeLeft--;
+            updateTimer();
+        } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById("timerMessage").textContent =
+                "Session completed! Great work!";
+            alert("Your 25-minute study session is complete!");
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    document.getElementById("timerMessage").textContent = "Timer paused.";
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timeLeft = 25 * 60;
+    updateTimer();
+    document.getElementById("timerMessage").textContent = "Ready to study?";
+}
+
+updateTimer();
 function saveTasks() {
     localStorage.setItem("studyTasks", JSON.stringify(tasks));
 }
